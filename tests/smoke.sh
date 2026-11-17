@@ -18,11 +18,7 @@ trac-admin "$work/env" initenv Test sqlite:db/trac.db >/dev/null
 tar -xzf "$archive" -C "$work"
 cp -r "$work"/trac-mermaid_*/tracmermaid.py "$work"/trac-mermaid_*/tracmermaid_htdocs \
     "$work/env/plugins/"
-cat >> "$work/env/conf/trac.ini" <<'INI'
-
-[components]
-tracmermaid.* = enabled
-INI
+# nothing in trac.ini: a plugin in the plugins directory is enabled by itself
 printf 'A chart:\n\n{{{#!mermaid\nflowchart TD\n    A[Commit] --> B[Published]\n}}}\n' \
     > "$work/page.txt"
 trac-admin "$work/env" wiki import ChartTest "$work/page.txt" >/dev/null

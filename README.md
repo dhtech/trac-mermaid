@@ -48,14 +48,14 @@ tracmermaid_htdocs/MERMAID-LICENSE
 ```
 
 Put `tracmermaid.py` and the directory `tracmermaid_htdocs` in the
-`plugins` directory of the Trac environment, enable it in `trac.ini`
+`plugins` directory of the Trac environment and restart the web server.
+A plugin there is enabled by itself; to switch it off, say so in
+`trac.ini`:
 
 ```
 [components]
-tracmermaid.* = enabled
+tracmermaid.* = disabled
 ```
-
-and restart the web server.
 
 ## What can be drawn
 
