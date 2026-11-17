@@ -1,0 +1,27 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Tests, build and a real Trac (Debian 13)
+    runs-on: ubuntu-latest
+    container: debian:13
+    steps:
+      - name: What a wiki server has, and what the build needs
+        run: |
+          apt-get update -q
+          DEBIAN_FRONTEND=noninteractive apt-get install -y -q --no-install-recommends \
+            trac python3-pytest curl openssl ca-certificates git
+      - uses: actions/checkout@v7
+      - run: python3 -m pytest -q tests
+      - name: Build the release (fetches the pinned Mermaid)
+        run: sh build.sh
+      - name: The built plugin in a real Trac
+        run: sh tests/smoke.sh

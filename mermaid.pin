@@ -1,0 +1,5 @@
+# The Mermaid release this plugin carries: its version on npm, and the
+# checksum npm's registry gives for the package (dist.integrity).
+# build.sh fetches exactly this and refuses anything else.
+version=12.3.0
+integrity=sha512-4113TdXeLAsMruJ79OpFL5O8+LTFXhQqZ260rF3tgUmiNAtRm4Uume04I+65PRN6yZ69J4f8rVYWW8zRk65UYw==
