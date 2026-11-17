@@ -27,16 +27,20 @@ printf 'A chart:\n\n{{{#!mermaid\nflowchart TD\n    A[Commit] --> B[Published]\n
     > "$work/page.txt"
 trac-admin "$work/env" wiki import ChartTest "$work/page.txt" >/dev/null
 
-port=${SMOKE_PORT:-8765}
+# a port nobody has (or the one asked for), and the answer must come
+# from the Trac started here - not from something older on that port
+port=${SMOKE_PORT:-$(python3 -c 'import socket; s = socket.socket(); s.bind(("127.0.0.1", 0)); print(s.getsockname()[1])')}
 tracd --port "$port" --hostname 127.0.0.1 --single-env "$work/env" \
     > "$work/tracd.log" 2>&1 &
 pid=$!
 n=0
 until curl -fsS -o "$work/page.html" "http://127.0.0.1:$port/wiki/ChartTest" 2>/dev/null; do
+    kill -0 "$pid" 2>/dev/null || { echo "Trac did not start:"; cat "$work/tracd.log"; exit 1; }
     n=$((n + 1))
     [ "$n" -le 100 ] || { echo "Trac did not answer"; cat "$work/tracd.log"; exit 1; }
     sleep 0.2
 done
+kill -0 "$pid" 2>/dev/null || { echo "something else answered on port $port"; exit 1; }
 
 grep -q '<pre class="mermaid">' "$work/page.html"
 grep -q 'A\[Commit\] --&gt; B\[Published\]' "$work/page.html"

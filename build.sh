@@ -10,7 +10,12 @@
 # Mermaid is fetched from npm's registry - the one release mermaid.pin
 # names, checked against the checksum written there - and only its one
 # browser file and its licence are taken out of the package.
-# Needs curl, openssl, tar.
+# Needs curl, openssl, tar, gzip.
+#
+# The same source gives the same archive, byte for byte: the files in it
+# are sorted, carry the time of the commit they were built from, and the
+# compression writes no time of its own. So anybody can build a tag
+# again and compare with the release's SHA256SUMS.
 set -eu
 cd "$(dirname "$0")"
 
@@ -39,7 +44,12 @@ cp tracmermaid_htdocs/tracmermaid.js "build/${name}/tracmermaid_htdocs/"
 cp build/npm/package/dist/mermaid.min.js "build/${name}/tracmermaid_htdocs/"
 cp build/npm/package/LICENSE "build/${name}/tracmermaid_htdocs/MERMAID-LICENSE"
 printf 'trac-mermaid %s\nmermaid %s\n' "$version" "$mermaid" > "build/${name}/VERSION"
-tar -C build --owner=0 --group=0 --numeric-owner -czf "dist/${name}.tar.gz" "${name}"
+# the time of the commit (a checkout made by somebody else - CI in a
+# container - is still ours to ask); outside a checkout, a fixed one
+when=${SOURCE_DATE_EPOCH:-$(git -c safe.directory='*' log -1 --format=%ct 2>/dev/null || echo 0)}
+chmod -R u=rwX,go=rX "build/${name}"
+tar -C build --sort=name --mtime="@${when}" --owner=0 --group=0 --numeric-owner \
+    -cf - "${name}" | gzip -n -9 > "dist/${name}.tar.gz"
 (cd dist && sha256sum -- * > SHA256SUMS)
 echo "built dist/${name}.tar.gz (mermaid ${mermaid})"
 tar -tzf "dist/${name}.tar.gz"

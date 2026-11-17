@@ -24,9 +24,14 @@ edited like any other wiki text and shows up in the page's diffs.
 - **A chart is text and nothing else.** Labels are drawn as text, not as
   HTML: a tag written in a chart is shown as it was written and makes
   nothing happen (only `<br>` breaks a line). Mermaid runs with its
-  strict security level: no scripts, no links that run anything.
+  strict security level: no scripts, no links that run anything. A
+  chart cannot switch any of this off for itself: the settings are
+  closed to the `%%{init}%%` line and the front matter a chart may
+  carry. Its looks - the theme, the colours - it may still choose.
 - **A chart Mermaid cannot read** stays as its text, with what Mermaid
-  said about it underneath.
+  said about it underneath. So does every chart when Mermaid's script
+  could not be loaded.
+- A chart inside something folded away is drawn when it comes into view.
 - On a page with a dark background the chart gets Mermaid's dark colours.
 
 For Trac 1.6 (Python 3). Tried on Debian 13's `trac` package.
@@ -75,6 +80,9 @@ sh tests/smoke.sh              # the built plugin in a real Trac; needs trac and
 npm's registry, checks it against the checksum written there, and takes
 Mermaid's browser file and its licence out of it. A newer Mermaid is a
 change of the two lines in `mermaid.pin`.
+
+The same commit gives the same archive, byte for byte: build a tag again
+and compare with the release's `SHA256SUMS`.
 
 A tag `vX.Y.Z` builds the release on GitHub; the number is the one in
 `tracmermaid.py`.
